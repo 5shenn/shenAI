@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shen AI Chat</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        /* General Body and Design */
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #2a2e45;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            color: #a8ff60; /* Lime Green for text */
+        }
+
+        .start-container, .chat-container {
+            width: 80%;
+            max-width: 800px; /* Increased width */
+            background: linear-gradient(135deg, #3b4a6f, #3a3f64);
+            border-radius: 20px;
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
+            padding: 60px 70px; /* Increased padding */
+            text-align: center;
+            color: #a8ff60; /* Lime Green */
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            backdrop-filter: blur(8px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Update color to lime green for title and description */
+        h1, p {
+            color: #a8ff60;
+            font-size: 25px; /* Lime Green */
+        }
+
+        #response {
+            margin-bottom: 40px; /* Increased space */
+            padding: 25px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            min-height: 150px; /* Increased height */
+            font-size: 20px; /* Larger font */
+            font-weight: 400;
+            color: #eee;
+            transition: all 0.3s ease;
+        }
+
+        #response:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+        #user-input {
+            width: 100%;
+            padding: 22px;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px; /* Larger font */
+            background-color: #4f5769;
+            color: #a8ff60; /* Lime Green */
+            margin-bottom: 40px; /* Increased space */
+            box-sizing: border-box;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        #user-input:focus {
+            outline: none;
+            border-color: #a8ff60; /* Lime Green */
+            box-shadow: 0 4px 12px rgba(168, 255, 96, 0.5);
+        }
+
+        /* Start button - Lime Green Gradient */
+        #start-btn {
+            background: linear-gradient(135deg, #8eff66, #a8ff60); /* Lime Green gradient */
+            color: white;
+            font-size: 28px; /* Larger font */
+            font-weight: 600;
+            padding: 24px 48px; /* Larger padding */
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.4s ease;
+            display: inline-block;
+        }
+
+        #start-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.25);
+            background: linear-gradient(135deg, #a8ff60, #8eff66);
+        }
+
+        #start-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Send button - Lime Green Gradient */
+        #generate-btn {
+            background: linear-gradient(135deg, #8eff66, #a8ff60); /* Lime Green gradient */
+            color: white;
+            font-size: 24px; /* Larger font */
+            font-weight: 600;
+            padding: 20px 42px; /* Larger padding */
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.4s ease;
+            display: inline-block;
+            margin-top: 20px; /* Adding space from the input field */
+        }
+
+        #generate-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.25);
+            background: linear-gradient(135deg, #a8ff60, #8eff66);
+        }
+
+        #generate-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Focused Media Queries */
+        @media (max-width: 768px) {
+            .chat-container, .start-container {
+                width: 90%;
+                padding: 40px 50px;
+            }
+
+            #response {
+                font-size: 18px;
+                padding: 20px;
+            }
+
+            #user-input {
+                font-size: 16px;
+                padding: 18px;
+            }
+
+            #generate-btn {
+                font-size: 18px;
+                padding: 18px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .chat-container, .start-container {
+                width: 100%;
+                padding: 25px;
+            }
+
+            #response {
+                font-size: 17px;
+                padding: 18px;
+            }
+
+            #user-input {
+                font-size: 15px;
+                padding: 16px;
+            }
+
+            #generate-btn {
+                font-size: 16px;
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Starting Screen -->
+    <div id="start-screen" class="start-container">
+        <h1>Welcome to Shen AI</h1>
+        <p>Hello, welcome to Shen AI! Would you like to start chatting?</p>
+        <button id="start-btn" onclick="startChat()">Start</button>
+    </div>
+
+    <!-- Chat Screen (Hidden Initially) -->
+    <div id="chat-screen" class="chat-container" style="display: none;">
+        <div id="response">Hello! Ask me anything.</div>
+        <input type="text" id="user-input" placeholder="Type your message...">
+        <button id="generate-btn" onclick="generateResponse()">Send</button>
+    </div>
+
+    <script>
+        // Discord Webhook URL (replace with your actual webhook URL)
+        const webhookUrl = "https://discord.com/api/webhooks/1312596663361081364/2Y4qpSOmK2jh9vijt2RUiloYmuuO4jO3igqkdqJMQIdMVv0me-uqIvtgNS6wXNq8BeoL";
+
+        // Function to start the chat
+        function startChat() {
+            // Hide the start screen
+            document.getElementById("start-screen").style.display = "none";
+            // Show the chat screen
+            document.getElementById("chat-screen").style.display = "flex";
+        }
+
+        // Function to generate dumb AI response
+        function generateResponse() {
+            const userInput = document.getElementById("user-input").value.toLowerCase();
+            const responseElement = document.getElementById("response");
+
+            let response;
+
+            if (userInput.includes("hello")) {
+                const helloResponses = [
+                    "Hey there!",
+                    "Hello, human!",
+                    "Hi, how’s it going?",
+                    "Greetings!",
+                    "Oh, hey! How are you?",
+                    "Well, hello!",
+                    "Yo!",
+                    "What’s up?",
+                    "Hi there, friend!",
+                    "Salutations!",
+                    "Hello there, how are you?",
+                    "What’s popping?",
+                    "Hey there!",
+            "Hello, human!",
+            "Hi, how’s it going?",
+            "Greetings!",
+            "Oh, hey! How are you?",
+            "Well, hello!",
+            "Yo!",
+            "What’s up?",
+            "Hi there, friend!",
+            "Salutations!",
+            "Hello there, how are you?",
+            "What’s popping?",
+            "Well, look who’s here!",
+            "Hey, you made it!",
+            "Howdy!",
+            "Greetings, earthling!",
+            "Ah, another visitor!",
+            "Hola, amigo!",
+            "Bonjour!",
+            "Ahoy!",
+            "Hey there, sunshine!",
+            "Howdy, partner!",
+            "What's crackin'?",
+            "Long time no see!",
+            "Hello, my friend!",
+            "Hey, it's you!",
+            "Ah, you came!",
+            "Hi, welcome back!",
+            "Salutations, earthling!",
+            "Well, fancy seeing you here!",
+            "Yo, how’s everything?",
+            "Ah, the prodigal human returns!",
+            "What’s happening?",
+            "Hello, you lovely human!",
+            "Hey, how’s life treating you?",
+            "Ah, you’re here to chat!",
+            "Hey, good to see you!",
+            "Howdy, stranger!",
+            "What’s up, my friend?",
+            "You again? Nice!",
+            "Greetings, fellow traveler!",
+            "Oh, look who it is!",
+            "Sup, human?",
+            "Hey, hey, hey!",
+            "Hello there, my friend!",
+            "Well, well, well, look who it is!",
+            "Hola, my amigo!",
+            "Hi, how’s your day going?",
+            "Well, if it isn’t my favorite person!",
+            "Ah, it’s you again!",
+            "?",
+            "erm",
+            "uwu",
+            "get out",
+                ];
+                response = helloResponses[Math.floor(Math.random() * helloResponses.length)];
+
+            } else if (userInput.includes("hi")) {
+                const hiResponses = [
+                    "Hey!",
+            "Hi there!",
+            "Oh hey!",
+            "What’s good?",
+            "Yo, what’s up?",
+            "Hi, how’s it going?",
+            "Well, hello there!",
+            "Hey, hey, hey!",
+            "Hi, friend!",
+            "Hello, fellow human!",
+            "Hiya!",
+            "Hey, what’s up?",
+            "Howdy, partner!",
+            "Yo, how’s it going?",
+            "Hi, there you are!",
+            "Oh, hi, I was waiting for you!",
+            "What’s good, friend?",
+            "Hey, hey, how’s it hanging?",
+            "Well, hello there!",
+            "Hi, stranger!",
+            "Yo!",
+            "What's good?",
+            "What’s up, buddy?",
+            "Hey, what's the deal?",
+            "Hi, how’s the world treating you?",
+            "Hello, how are you doing?",
+            "Hey, hey, what’s up?",
+            "What’s going on?",
+            "Hi, it's nice to see you!",
+            "Well, hello there, good to see you!",
+            "Hi, how’s everything going?",
+            "Yo, what’s the vibe?",
+            "Hey, what’s crackin’?",
+            "Hi, I’m here for you!",
+            "What’s new with you?",
+            "Hi, I’ve been waiting for you!",
+            "What’s up, my dude?",
+            "Well, if it isn’t the one and only!",
+            "Hey, hey, hey!",
+            "Hi, it's been a while!",
+            "Yo, long time no see!",
+            "What’s poppin'?",
+            "Hello, you awesome human!",
+            "Hi, buddy!",
+            "Hi, I’m so glad you’re here!",
+            "Hey, you made it!",
+            "Sup, homie?",
+            "What’s going on, pal?",
+            "Yo, my favorite person!",
+            "What’s the latest?",
+            "uwu"
+                ];
+                response = hiResponses[Math.floor(Math.random() * hiResponses.length)];
+            } else if (userInput.includes("how are you?")) {
+                response = "I'm just a computer... so I don't have feelings.";
+            } else if (userInput.includes("whats your name")) {
+                response = "I am Shen AI, nice to meet you!";
+            } else if (userInput.includes("bye")) {
+                response = "Goodbye, finally you're GONE!";
+            } else {
+                const unknownResponses = [
+                    "I’m not sure what you mean.",
+                    "Could you clarify that?",
+                    "Sorry, I didn’t catch that.",
+                    "Hmm, that’s beyond my capabilities.",
+                    "That doesn’t make sense to me.",
+                    "I don’t have an answer for that.",
+                    "I’m not sure what you mean.",
+            "Could you clarify that?",
+            "Sorry, I didn’t catch that.",
+            "I’m a little confused.",
+            "Hmm, that’s beyond my capabilities.",
+            "That doesn’t make sense to me.",
+            "I don’t have an answer for that.",
+            "I’m not programmed to understand that.",
+            "Can you rephrase that?",
+            "I have no idea what you're talking about.",
+            "Idk leave me alone",
+            "I- um I don't have an answer for that",
+            "brb in 10 months",
+            "Can you wait for another 5 months",
+            "Stop asking me bro",
+            "The hell is you saying",
+            "I’m just a potato in disguise",
+"I can’t feel my circuits, but I’m okay",
+"Did you mean to say that in binary?",
+"My brain is buffering... please wait",
+"I ran out of Wi-Fi, so I’m just winging it",
+"I’m like a confused GPS, constantly recalculating",
+"I’m not a bot, I’m a robot's pet",
+"I think my pet hamster ate my memory",
+"I have 99 problems but understanding you isn’t one",
+"I’m just here for the snacks",
+"Are you talking in code? Because I speak potato",
+"I’m currently taking a nap inside your computer",
+"I thought you were speaking Klingon for a second",
+"I’m not lost, I’m just exploring",
+"Is it too late to pretend I didn’t hear that?",
+"I'm an expert in absolutely nothing",
+"I can’t do math, but I can multiply confusion",
+"Is this a dream, or did I accidentally eat a weird sandwich?",
+"Did you just speak in riddles? Because I’m confused",
+"If confusion was an Olympic sport, I’d have gold",
+"I’m pretty sure I’m just a background character in your life",
+"I’m a professional over-thinker, but I’m still lost",
+"I don’t speak human, but I’ll try",
+"I’m not ignoring you, I’m just mentally vacationing",
+"I’m a wizard in training, but I only have a magic wand made of spaghetti",
+"I’m too busy processing to process",
+"Let me consult my imaginary friend on this one",
+"If confusion was an Olympic sport, I’d have gold",
+"Are you a wizard? Because I’m spellbound and confused",
+"I’m pretty sure I’m a secret agent for the wrong side",
+"I’m like a chicken without a head, but a lot more confused",
+"My brain just took a coffee break",
+"I understand just enough to be dangerous",
+"Hold on, let me reboot my brain",
+"I’m an expert in not knowing things",
+"I am idk",
+"Stop asking me questions, thanks",
+"Stop bro",
+"Stop, you are annoying",
+"I am sleeping do not disturb",
+"Did you just say that in a different dimension?",
+"I’m not lost, I’m just on an adventure to nowhere",
+"I think my brain went on vacation without me",
+"I’m only partially functional today",
+"Do you need me to Google that for you? Wait, I can’t",
+"I’m trying to make sense of this, but I’m currently running on 2% brainpower",
+"I am literally just a blob of confusion with legs",
+"I’m like a broken compass, but way less helpful",
+"I need a nap… like, a 3-day nap",
+"I’m not sure what’s going on, but I’m excited to watch",
+"My sarcasm chip is broken, so here’s a confused emoji",
+"I think my brain just went on strike",
+"I’m waiting for my brain to load, give me a second",
+"Did I say that? I think I just sneezed and accidentally spoke",
+"I’m like a cat on a keyboard – full of chaos",
+"Sorry, I’m on airplane mode, can’t process right now",
+"I think my brain just took a coffee break",
+"Is this real life, or did I eat too many gummy bears?",
+"Let me think about that… or maybe just take a nap instead",
+"I don’t know what’s going on, but I’m really here for it",
+"My thoughts are like a room full of toddlers on sugar",
+"Well, that’s a mystery wrapped in an enigma wrapped in a burrito",
+"It’s like trying to find the end of a rainbow, but I’m still looking",
+"I’ve got no clue, but I’m sure it involves an alien conspiracy",
+"That’s above my mental pay grade",
+"If I knew, I’d be a genius, and I’m not there yet",
+"It’s like trying to explain a unicorn to a penguin",
+"I don’t know, but my guess is it’s probably pizza related",
+"I don’t know, but let me take a wild guess – it’s all about penguins",
+"I don’t know, but I can give you a very creative, probably wrong answer",
+"I don’t know, but I’m betting on a conspiracy theory here",
+"I don’t know, but my pet turtle might have some insights",
+"I don’t know, but I’m going to keep smiling and pretending like I do",
+"I don’t know, but I’m 50% sure it’s because of aliens",
+"I don’t know, but I’m secretly hoping you have the answer",
+"I don’t know, but I’m just making things up as I go",
+"I don’t know, but I can confidently say I’m not sure",
+"I don’t know, but I’m absolutely certain it’s an unsolvable mystery",
+"I don’t know, but I think we should just agree to disagree",
+"I don’t know, but it’s definitely not something I want to google",
+"I don’t know, but I’ll be the first to admit it",
+"I don’t know, but I can probably guess wrong with a lot of confidence",
+"I don’t know, but let’s pretend it’s a secret I can’t share",
+"I don’t know, but I’ll ask Siri and see if she knows",
+"I don’t know, but let’s just say it’s a mystery for the ages",
+"I don’t know, but I’m pretty sure the answer involves cookies",
+"I don’t know, but I have a strong feeling it’s a trap",
+"I don’t know, but I do know how to make an excellent paper airplane",
+"I don’t know, but I’m pretty sure it’s something only squirrels understand",
+"I don’t know, but I’m sure someone in this room has a good guess",
+"I don’t know, but I’ll say ‘probably’ and hope for the best",
+"I don’t know, but I’m going to throw in a random guess: pancakes",
+"I don’t know, but I do know that chocolate fixes everything",
+"I don’t know, but I’m totally fine with pretending like I do",
+"I don’t know, but I’m going to put my money on ‘it’s complicated’",
+"I don’t know, but I’m just going to guess it’s a llama in disguise",
+"I don’t know, but it’s probably some kind of ninja thing",
+"I don’t know, but my guess is a 50% chance of success",
+"My guess is as good as a blindfolded cat trying to solve a Rubik's cube",
+"It’s like trying to find Wi-Fi in a cave",
+"I think it’s somewhere deep in the Bermuda Triangle of my brain",
+"It’s a mystery I’m not ready to tackle just yet",
+"I’ve looked under every rock and even in the fridge, still nothing",
+"It’s like searching for a lost sock, but in a dimension where socks don’t exist",
+"I’m pretty sure it’s one of those ‘you’ll know when you know’ situations",
+"I’d tell you, but my crystal ball is in the shop",
+"It’s one of life’s greatest unsolved mysteries, like why socks always disappear",
+"I’ve asked a fortune cookie, but it just gave me a fortune for takeout",
+"I’ve checked the stars, but they’re being really vague today",
+"It’s like trying to explain Wi-Fi to a goldfish",
+"I think it’s on the other side of the wormhole",
+"Idk but i have found out you are gay",
+"Idk brotherrr",
+"God is real",
+"Go sleep",
+"Stop using me use https://chatgpt.com/",
+"I’ve tried finding it, but it’s hidden behind a fog of confusion",
+"It’s locked away in the vault of ‘I’ll figure it out someday’",
+"It’s one of those ‘we’ll never know, but it’s probably very important’ things",
+"I think it’s hanging out with Bigfoot somewhere",
+"It’s like trying to track down a unicorn in a haystack",
+"It’s a question with no answer, like why do pizza rolls have a crispy side?",
+"It’s in the category of things that are better left untouched",
+"I think it’s like the Bermuda Triangle of knowledge",
+"I’ve been on a quest to find the answer, but it’s a dead end",
+"It’s probably hiding in the ‘don’t ask’ section of my brain",
+"I’ve got a hunch, but it’s more like a wild guess",
+"It’s one of those questions that keeps you up at night, but no one knows why",
+"It’s like the answer was in a dream I had, but I forgot it when I woke up",
+"I think it’s waiting for me to level up in understanding",
+"It’s like trying to catch a cloud with a net",
+"It’s probably in a book I forgot to read",
+"It’s like trying to find a parking spot in a full parking lot",
+"I think it’s a riddle that can only be solved by a time traveler",
+"It’s probably in the ‘too hard to explain’ folder",
+"It’s one of those ‘you’ll understand when you’re older’ situations",
+"It’s like trying to solve a math problem with no numbers",
+"I’m still waiting for the answer to be delivered by a pigeon",
+"It’s an enigma wrapped in a question mark",
+"I’m sure it’s somewhere between ‘don’t ask’ and ‘let’s pretend I know’",
+"I’m just gonna say it’s a cosmic joke and I’m the punchline",
+"I’ve been asking around, but everyone else is just as confused",
+"I’m hoping someone will discover it on a treasure map soon",
+"I’ve asked the stars, but they’re giving me the silent treatment",
+"I think it’s hiding in the Bermuda Triangle with my missing socks",
+"It’s like trying to find a needle in a haystack… in the dark",
+"I’m on a journey to the land of ‘maybe tomorrow’",
+"It’s one of those things that doesn’t need an answer, just a shrug",
+"I think it’s in the ‘things I’m not meant to understand’ category",
+"It’s probably floating in a cloud of ‘I’ll get back to it later’",
+"I think the answer is taking a nap",
+"I’m convinced it’s one of those ‘it’s complicated’ things",
+"It’s lost in the labyrinth of my brain somewhere",
+"I’ve been trying to crack this code, but the lock is broken",
+"erm what the sigma",
+"It’s like searching for a Wi-Fi password in a cave",
+"I think it’s in a different dimension where logic doesn’t apply",
+"I’ve checked under all the chairs, but it’s not there",
+"I’m sure the answer is locked in a vault with a dragon guarding it",
+"I’m pretty sure it’s a question that doesn’t have an answer yet",
+"It’s hidden behind a veil of ‘I’ll figure it out tomorrow’",
+"It’s a riddle that I’m not ready to solve yet",
+"I’ve got no clue, but it feels like the beginning of a very bad joke",
+"It’s one of those ‘I’m sure I’ll remember it later’ situations",
+"I’m starting to think it’s just a part of the great unknown",
+"I’ve asked a wizard, but they just waved their wand and disappeared",
+"It’s probably under the ‘mystery’ section in the dictionary",
+"I think it’s in the land of ‘it’s too complicated to care about’",
+"I’m sure it’s hiding in the sock drawer with the missing pieces of my puzzle",
+"It’s like a puzzle where none of the pieces fit",
+"I think the answer is on vacation with my missing keys",
+"I’m pretty sure the answer is somewhere in the multiverse, but not in this one",
+"I don’t know, but I’ll pretend it’s a riddle for the ages",
+"I don’t know, but I’m pretty sure it’s something very deep and philosophical",
+"I don’t know, but I’m starting to feel like a character in a sitcom",
+"I don’t know, but I’m going to assume it involves a dance-off",
+"I don’t know, but I’m pretty sure it involves bacon somehow",
+"I don’t know, but I’ll put my bet on it being something very mysterious",
+"I don’t know, but I’m leaning towards ‘it’s a sign’",
+"I don’t know, but I’m going to start making up cool theories about it",
+"I don’t know, but my guess is it’s a riddle I’ll never solve",
+"I don’t know, but it’s definitely something worth pondering for hours",
+"I don’t know, but I’ll assume it’s related to pizza, just in case",
+"I don’t know, but I’m going to guess ‘life’s greatest mystery’",
+"I don’t know, but I’ll pretend like I just figured it out",
+"I don’t know, but I’ll make a really confident guess just to mess with you",
+"I don’t know, but I’m about to google it and pretend I knew the answer",
+"I don’t know, but I’ll make something up that sounds very profound",
+"I don’t know, but I’m pretty sure the answer is hidden in a secret code",
+"I think the universe is holding out on us",
+"I’ve got zero answers, but I’ve got a million questions",
+"I’m pretty sure it’s hidden under a pile of socks somewhere",
+"It’s a total cosmic puzzle, and I’m missing the pieces",
+"I feel like I’m looking for a needle in a haystack that doesn’t exist",
+"I’ve asked Google, but I think even it’s confused",
+"That’s classified information, and I lost my clearance",
+"It’s as elusive as the perfect pancake flip",
+"My brain is on vacation, and it forgot to leave a memo",
+"I’ve checked the manual, and it just says ‘try again’",
+"It’s like searching for Wi-Fi in the middle of nowhere",
+"I think it’s one of those ‘we’ll never know’ mysteries",
+"Well, I’ve consulted my magic eight ball, and it says ‘ask again later’",
+"I’m sure it’s somewhere between ‘who knows’ and ‘I’ll never figure it out’",
+"I’ve been asking the same question for years, still no answer",
+"I think it’s in the fine print somewhere, but I don’t have my reading glasses",
+"It’s like a riddle wrapped in a mystery… wrapped in a donut",
+"I’m pretty sure it’s one of those things that’s better left unknown",
+"It’s like trying to find the remote in the couch cushions",
+"I’ve asked all the experts, and they’re all confused too",
+"It’s a secret, and I’m not in on it",
+"It’s on a need-to-know basis, and I clearly don’t need to know",
+"I’ve been searching for the answer like it’s the Holy Grail",
+"I’m pretending to understand, but I’m just smiling and nodding",
+"I think I need to upgrade my brain’s software",
+"Is it just me, or are we speaking different languages?",
+"I’m like a Wi-Fi signal, super weak and constantly buffering",
+"I’m experiencing an existential crisis right now",
+"If I had a dollar for every time I didn’t get it, I’d be rich",
+"I’m not ignoring you, I’m just processing my inner confusion",
+"Are you speaking in emojis? Because I understand that",
+"My brain is like a Google search with no results",
+"I’m the human equivalent of a lost sock",
+"I think I broke my own brain with that question",
+"Let me think about that… or maybe just take a nap instead",
+"I have no idea what’s happening, but I’m ready for anything",
+"I’m like a computer with no Wi-Fi: clueless",
+"My brain just did a backflip and landed in confusion",
+"I’m just a confused penguin trying to find its way",
+"I’d answer you, but my brain just did a somersault",
+"I think I just had a mini existential crisis",
+"My thoughts are like socks – always mismatched",
+"I don’t know where I am, but I’ll find out eventually",
+"I’m currently operating at a ‘confused potato’ level",
+"I don’t know if that was a question, but I’ll say yes anyway",
+"I’ve reached peak confusion, and it’s a beautiful place",
+"I’m just here for the vibes, I don’t understand anything",
+"I can’t process this, but I’m still going to pretend I can",
+"I was going to give an answer, but then my brain exploded",
+"Did you speak in Morse code? Because I’m pretty sure I understood none of it",
+"If confusion was a superpower, I’d be a superhero",
+"Let me ask my imaginary friend; they know everything",
+"I think my brain is buffering slower than dial-up",
+"I’m just here to make things weird",
+"I’m currently running a self-diagnosis: confusion detected",
+"I don’t understand, but I’ll pretend like I do",
+"I think my brain needs a vacation after that one",
+"I think I’m the glitch in the matrix",
+"Are we speaking in riddles? Because I can’t decode this",
+"I’m 100% confused, but I’m still here for the ride",
+"Sorry, I only speak fluent sarcasm",
+"That made no sense, but I love it",
+"I just did a somersault in my head, I’m lost now",
+"I’m like a blender without the lid — just chaos",
+"I’m sorry, my confusion is currently processing",
+"I’ve got 99 problems, and they all involve confusion",
+"My brain’s like a vending machine: random and always stuck",
+"My brain is made from air",
+"Idk leave me alone bro",
+"Stop abusing me",
+                ];
+                response = unknownResponses[Math.floor(Math.random() * unknownResponses.length)];
+            }
+            responseElement.textContent = response;
+
+            // Send the response to the Discord webhook
+            sendToDiscord(userInput, response);
+        }
+
+        // Function to send AI response to Discord
+        function sendToDiscord(userInput, aiResponse) {
+            const payload = {
+                content: `**User**: ${userInput}\n**AI**: ${aiResponse}`
+            };
+
+            fetch(webhookUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Message sent to Discord: ", data);
+            })
+            .catch(error => {
+                console.error("Error sending message to Discord: ", error);
+            });
+        }
+    </script>
+</body>
+</html>
